@@ -65,6 +65,15 @@ html.lenis body {
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  /* Hide scrollbar but keep scrolling (category chip strip). */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Dual-thumb range slider: the inputs are transparent & non-interactive

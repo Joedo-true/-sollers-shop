@@ -3,10 +3,14 @@ import { Plus, SlidersHorizontal, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchCategories, fetchProducts } from './api/products'
 import { CartDrawer } from './components/CartDrawer'
+import { CategoryChips } from './components/CategoryChips'
 import { ErrorState } from './components/ErrorState'
 import { FilterSidebar } from './components/FilterSidebar'
+import { Footer } from './components/Footer'
 import { Header } from './components/Header'
+import { Hero } from './components/Hero'
 import { ProductGrid } from './components/ProductGrid'
+import { PromoBar } from './components/PromoBar'
 import { ScrollToTop } from './components/ScrollToTop'
 import { SortSelect } from './components/SortSelect'
 import { useDebounce } from './hooks/useDebounce'
@@ -241,13 +245,24 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100">
+      <PromoBar />
       <Header search={searchInput} onSearchChange={setSearchInput} />
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <Hero productCount={products.length} />
+
+        <CategoryChips
+          categories={categories}
+          selected={selectedCategories}
+          onToggle={toggleCategory}
+          onClear={() => setSelectedCategories([])}
+          loading={loading}
+        />
+
         {/* items-start keeps the tall sidebar from stretching the catalog
             column, and the capped, self-scrolling sidebar means a short,
             filtered result set no longer leaves empty space below the grid. */}
-        <div className="flex items-start gap-8">
+        <div id="catalog" className="flex scroll-mt-24 items-start gap-8">
           {/* Desktop sidebar */}
           <aside className="hidden w-64 shrink-0 lg:block">
             <div
@@ -263,9 +278,9 @@ export default function App() {
             {/* Toolbar */}
             <div className="mb-5 flex items-center justify-between gap-3">
               <div>
-                <h1 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+                <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
                   Каталог товаров
-                </h1>
+                </h2>
                 <span className="mt-1.5 block h-1 w-12 rounded-full bg-gradient-to-r from-brand-500 to-brand-300" />
                 {!loading && !error && (
                   <p className="mt-1.5 text-sm text-slate-500">
@@ -324,6 +339,8 @@ export default function App() {
           </section>
         </div>
       </main>
+
+      <Footer />
 
       {/* Mobile filter drawer */}
       <AnimatePresence>
