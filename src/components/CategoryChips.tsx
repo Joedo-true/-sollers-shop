@@ -45,8 +45,8 @@ export function CategoryChips({
         onClick={onClear}
         className={`flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
           allActive
-            ? 'border-brand-600 bg-brand-600 text-white shadow-sm shadow-brand-600/20'
-            : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-600'
+            ? 'border-transparent bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-glow'
+            : 'border-slate-200 bg-white text-slate-600 shadow-soft hover:border-brand-300 hover:text-brand-600'
         }`}
       >
         <LayoutGrid className="h-4 w-4" />

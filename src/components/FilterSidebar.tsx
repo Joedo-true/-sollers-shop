@@ -41,8 +41,10 @@ export function FilterSidebar({
     <div className="flex h-full flex-col gap-6">
       {/* Heading + reset */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-slate-900">
-          <SlidersHorizontal className="h-5 w-5 text-brand-600" />
+        <div className="flex items-center gap-2.5 text-slate-900">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+            <SlidersHorizontal className="h-4 w-4" />
+          </span>
           <h2 className="text-base font-bold">Фильтры</h2>
         </div>
         {hasActiveFilters && (
@@ -101,9 +103,9 @@ export function FilterSidebar({
       )}
 
       {/* Result count footer */}
-      <div className="mt-auto rounded-xl bg-slate-50 px-4 py-3 text-center text-sm text-slate-600">
+      <div className="mt-auto rounded-xl border border-brand-100 bg-gradient-to-r from-brand-50 to-indigo-50 px-4 py-3 text-center text-sm text-slate-600">
         Найдено товаров:{' '}
-        <span className="font-bold text-slate-900">{resultCount}</span>
+        <span className="font-bold text-brand-700">{resultCount}</span>
       </div>
     </div>
   )

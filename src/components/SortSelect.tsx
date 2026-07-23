@@ -22,7 +22,7 @@ export function SortSelect({ value, onChange }: SortSelectProps) {
         value={value}
         onChange={(e) => onChange(e.target.value as SortOption)}
         aria-label="Сортировка товаров"
-        className="cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-9 text-sm font-medium text-slate-700 shadow-sm outline-none transition-colors hover:border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+        className="cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-9 text-sm font-medium text-slate-700 shadow-soft outline-none transition-colors hover:border-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
       >
         {OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>

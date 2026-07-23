@@ -40,10 +40,10 @@ export function ProductCard({ product }: ProductCardProps) {
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -6 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-[box-shadow,border-color] duration-200 hover:border-brand-200 hover:shadow-xl hover:shadow-slate-300/50"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card ring-1 ring-transparent transition-[box-shadow,border-color] duration-300 hover:border-brand-200 hover:shadow-card-hover"
     >
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-slate-50 to-white p-5">
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 p-5">
         <img
           src={product.thumbnail}
           alt={product.title}
@@ -53,12 +53,12 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Badges */}
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">
           {hasDiscount && (
-            <span className="rounded-full bg-rose-500 px-2.5 py-1 text-xs font-bold text-white shadow-sm shadow-rose-500/30">
+            <span className="rounded-full bg-gradient-to-r from-rose-500 to-rose-600 px-2.5 py-1 text-xs font-bold text-white shadow-sm shadow-rose-500/40">
               −{Math.round(product.discountPercentage)}%
             </span>
           )}
           {product.rating >= 4.5 && (
-            <span className="rounded-full bg-amber-400 px-2.5 py-1 text-xs font-bold text-amber-950 shadow-sm">
+            <span className="rounded-full bg-gradient-to-r from-amber-300 to-amber-400 px-2.5 py-1 text-xs font-bold text-amber-950 shadow-sm shadow-amber-400/40">
               ХИТ
             </span>
           )}
@@ -102,10 +102,10 @@ export function ProductCard({ product }: ProductCardProps) {
           disabled={product.stock === 0}
           whileTap={{ scale: 0.97 }}
           aria-label={`Добавить «${product.title}» в корзину`}
-          className={`mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none ${
+          className={`mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white shadow-sm transition-all disabled:cursor-not-allowed disabled:bg-none disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none ${
             justAdded
-              ? 'bg-emerald-500'
-              : 'bg-brand-600 hover:bg-brand-700'
+              ? 'bg-emerald-500 shadow-emerald-500/30'
+              : 'bg-gradient-to-r from-brand-600 to-brand-500 shadow-brand-600/25 hover:from-brand-700 hover:to-brand-600 hover:shadow-glow'
           }`}
         >
           {justAdded ? (

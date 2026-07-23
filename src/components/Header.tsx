@@ -58,7 +58,7 @@ export function Header({ search, onSearchChange }: HeaderProps) {
           type="button"
           onClick={openCart}
           aria-label={`Открыть корзину, товаров: ${count}`}
-          className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:border-brand-300 hover:text-brand-600"
+          className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:text-brand-600 hover:shadow-card"
         >
           <ShoppingCart className="h-5 w-5" />
           {count > 0 && (
@@ -67,7 +67,7 @@ export function Header({ search, onSearchChange }: HeaderProps) {
               initial={{ scale: 0.5 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-              className="absolute -right-1.5 -top-1.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-brand-600 px-1 text-xs font-bold text-white"
+              className="absolute -right-1.5 -top-1.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 px-1 text-xs font-bold text-white ring-2 ring-white"
             >
               {count > 99 ? '99+' : count}
             </motion.span>

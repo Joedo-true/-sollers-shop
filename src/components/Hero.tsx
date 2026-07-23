@@ -20,7 +20,7 @@ export function Hero({ productCount }: HeroProps) {
   }
 
   return (
-    <section className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-800 px-6 py-10 text-white shadow-xl shadow-brand-900/20 sm:px-10 sm:py-14">
+    <section className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-800 px-6 py-10 text-white shadow-xl shadow-brand-900/25 ring-1 ring-inset ring-white/10 sm:px-10 sm:py-14">
       {/* Decorative glows */}
       <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
       <div className="pointer-events-none absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-indigo-400/20 blur-3xl" />
@@ -29,7 +29,7 @@ export function Hero({ productCount }: HeroProps) {
       {/* Oversized watermark icon */}
       <ShoppingBag
         strokeWidth={1.25}
-        className="pointer-events-none absolute -right-4 bottom-0 hidden h-56 w-56 text-white/10 lg:block"
+        className="pointer-events-none absolute -right-4 bottom-4 hidden h-56 w-56 animate-float text-white/10 lg:block"
       />
 
       <div className="relative max-w-xl">

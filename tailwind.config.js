@@ -28,13 +28,24 @@ export default {
           'sans-serif',
         ],
       },
+      boxShadow: {
+        soft: '0 1px 2px 0 rgba(16, 24, 40, 0.04), 0 1px 3px 0 rgba(16, 24, 40, 0.06)',
+        card: '0 1px 2px 0 rgba(16, 24, 40, 0.04), 0 8px 24px -8px rgba(16, 24, 40, 0.10)',
+        'card-hover': '0 16px 40px -12px rgba(30, 64, 245, 0.22)',
+        glow: '0 10px 34px -10px rgba(53, 99, 255, 0.4)',
+      },
       keyframes: {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-6px)' },
+        },
       },
       animation: {
         shimmer: 'shimmer 1.5s infinite',
+        float: 'float 6s ease-in-out infinite',
       },
     },
   },

@@ -267,7 +267,7 @@ export default function App() {
           <aside className="hidden w-64 shrink-0 lg:block">
             <div
               data-lenis-prevent
-              className="scrollbar-thin sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5"
+              className="scrollbar-thin sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-slate-100 bg-white p-5 shadow-card"
             >
               {sidebar}
             </div>
@@ -295,7 +295,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setMobileFiltersOpen(true)}
-                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-slate-300 lg:hidden"
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-soft transition-colors hover:border-brand-300 hover:text-brand-600 lg:hidden"
                 >
                   <SlidersHorizontal className="h-4 w-4" />
                   Фильтры
@@ -327,7 +327,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={loadMore}
-                      className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-brand-300 hover:text-brand-600"
+                      className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:text-brand-600 hover:shadow-card"
                     >
                       <Plus className="h-4 w-4" />
                       Показать ещё
@@ -354,15 +354,17 @@ export default function App() {
               onClick={() => setMobileFiltersOpen(false)}
               className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden"
             />
+            {/* Flex column: fixed close header + a body that scrolls only
+                when the filters overflow, so the drawer never extends past the
+                viewport into empty space. */}
             <motion.div
-              data-lenis-prevent
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 320, damping: 34 }}
-              className="scrollbar-thin fixed inset-y-0 left-0 z-50 w-80 max-w-[85%] overflow-y-auto bg-white p-5 shadow-2xl lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 flex w-80 max-w-[85%] flex-col bg-white shadow-2xl lg:hidden"
             >
-              <div className="mb-4 flex justify-end">
+              <div className="flex shrink-0 justify-end px-4 pt-4">
                 <button
                   type="button"
                   onClick={() => setMobileFiltersOpen(false)}
@@ -372,7 +374,12 @@ export default function App() {
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              {sidebar}
+              <div
+                data-lenis-prevent
+                className="scrollbar-thin min-h-0 flex-1 overflow-y-auto px-5 pb-5"
+              >
+                {sidebar}
+              </div>
             </motion.div>
           </>
         )}
