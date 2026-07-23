@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: theme('fontFamily.sans');
+  }
+}
+
+@layer utilities {
+  /* Thin, unobtrusive scrollbar for the cart drawer & sidebar */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.slate.300') transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-300;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Two-line clamp for product titles */
+  .clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Dual-thumb range slider: the inputs are transparent & non-interactive
+   except for their draggable thumbs, which sit above the coloured track. */
+.range-thumb::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 1.15rem;
+  width: 1.15rem;
+  border-radius: 9999px;
+  background: #fff;
+  border: 2px solid theme('colors.brand.500');
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+.range-thumb::-webkit-slider-thumb:active {
+  transform: scale(1.15);
+}
+.range-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  height: 1.15rem;
+  width: 1.15rem;
+  border-radius: 9999px;
+  background: #fff;
+  border: 2px solid theme('colors.brand.500');
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+  cursor: pointer;
+}
+.range-thumb:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid theme('colors.brand.400');
+  outline-offset: 2px;
+}
