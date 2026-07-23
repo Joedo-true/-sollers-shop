@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { SlidersHorizontal, X } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Plus, SlidersHorizontal, X } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchCategories, fetchProducts } from './api/products'
 import { CartDrawer } from './components/CartDrawer'
 import { ErrorState } from './components/ErrorState'
@@ -10,10 +10,18 @@ import { ProductGrid } from './components/ProductGrid'
 import { ScrollToTop } from './components/ScrollToTop'
 import { SortSelect } from './components/SortSelect'
 import { useDebounce } from './hooks/useDebounce'
+import { getLenis, useSmoothScroll } from './hooks/useSmoothScroll'
 import { discountedPrice } from './store/cartStore'
 import type { Category, Filters, Product, SortOption } from './types'
+import { expandCatalog } from './utils/catalog'
+
+/** How many products to reveal per "page" of the infinite-scroll grid. */
+const PAGE_SIZE = 24
 
 export default function App() {
+  // Smooth, eased mouse-wheel / touch scrolling for the whole page.
+  useSmoothScroll()
+
   /* ---- Server data ---- */
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -34,6 +42,17 @@ export default function App() {
   // Mobile filter panel visibility.
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
+  // Lock background scroll while the mobile filter drawer is open.
+  useEffect(() => {
+    if (!mobileFiltersOpen) return
+    document.body.style.overflow = 'hidden'
+    getLenis()?.stop()
+    return () => {
+      document.body.style.overflow = ''
+      getLenis()?.start()
+    }
+  }, [mobileFiltersOpen])
+
   /* ---- Data fetching (products + categories in parallel) ---- */
   useEffect(() => {
     const controller = new AbortController()
@@ -46,7 +65,8 @@ export default function App() {
           fetchProducts(controller.signal),
           fetchCategories(controller.signal),
         ])
-        setProducts(productList)
+        // Enrich the finite API catalog with derived variants for a fuller shop.
+        setProducts(expandCatalog(productList, 2))
         setCategories(categoryList)
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return
@@ -131,6 +151,44 @@ export default function App() {
     sort,
   ])
 
+  /* ---- Incremental rendering (infinite scroll) ----
+     Keep the DOM light by only mounting a page of cards at a time; reveal more
+     as the sentinel scrolls into view. This keeps scrolling smooth even with a
+     large catalog, and — because the rendered list matches the results — the
+     page never grows taller than the products themselves. */
+  const [shown, setShown] = useState(PAGE_SIZE)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  // Any change to the result set restarts paging from the top.
+  useEffect(() => {
+    setShown(PAGE_SIZE)
+  }, [debouncedSearch, selectedCategories, selectedBrands, priceRange, sort])
+
+  const pageProducts = useMemo(
+    () => visibleProducts.slice(0, shown),
+    [visibleProducts, shown],
+  )
+  const hasMore = shown < visibleProducts.length
+  const loadMore = useCallback(
+    () => setShown((s) => Math.min(s + PAGE_SIZE, visibleProducts.length)),
+    [visibleProducts.length],
+  )
+
+  // Auto-load the next page when the sentinel becomes visible.
+  useEffect(() => {
+    if (!hasMore) return
+    const el = sentinelRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadMore()
+      },
+      { rootMargin: '600px 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [hasMore, loadMore])
+
   /* ---- Filter handlers ---- */
   const toggleCategory = useCallback((slug: string) => {
     setSelectedCategories((prev) =>
@@ -186,10 +244,16 @@ export default function App() {
       <Header search={searchInput} onSearchChange={setSearchInput} />
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex gap-8">
+        {/* items-start keeps the tall sidebar from stretching the catalog
+            column, and the capped, self-scrolling sidebar means a short,
+            filtered result set no longer leaves empty space below the grid. */}
+        <div className="flex items-start gap-8">
           {/* Desktop sidebar */}
           <aside className="hidden w-64 shrink-0 lg:block">
-            <div className="sticky top-24 rounded-2xl border border-slate-200 bg-white p-5">
+            <div
+              data-lenis-prevent
+              className="scrollbar-thin sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5"
+            >
               {sidebar}
             </div>
           </aside>
@@ -232,11 +296,30 @@ export default function App() {
                 onRetry={() => setReloadKey((k) => k + 1)}
               />
             ) : (
-              <ProductGrid
-                products={visibleProducts}
-                loading={loading}
-                onResetFilters={resetFilters}
-              />
+              <>
+                <ProductGrid
+                  products={pageProducts}
+                  loading={loading}
+                  onResetFilters={resetFilters}
+                />
+
+                {/* Infinite-scroll sentinel + manual fallback */}
+                {!loading && hasMore && (
+                  <div
+                    ref={sentinelRef}
+                    className="mt-8 flex justify-center"
+                  >
+                    <button
+                      type="button"
+                      onClick={loadMore}
+                      className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-brand-300 hover:text-brand-600"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Показать ещё
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </section>
         </div>
@@ -255,6 +338,7 @@ export default function App() {
               className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden"
             />
             <motion.div
+              data-lenis-prevent
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}

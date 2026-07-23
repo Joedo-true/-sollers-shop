@@ -36,10 +36,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <motion.article
-      layout
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.96 }}
       whileHover={{ y: -6 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-[box-shadow,border-color] duration-200 hover:border-brand-200 hover:shadow-xl hover:shadow-slate-300/50"

@@ -24,6 +24,23 @@
   }
 }
 
+/* Lenis smooth-scroll: recommended base styles. When Lenis is active it takes
+   over the wheel, so native scroll-behavior must be off; inner scrollable
+   areas opt out with [data-lenis-prevent]. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
 @layer utilities {
   /* Thin, unobtrusive scrollbar for the cart drawer & sidebar */
   .scrollbar-thin {

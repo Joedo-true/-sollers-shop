@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { getLenis } from '../hooks/useSmoothScroll'
 
 /**
  * A floating button that appears once the user has scrolled down and, on
- * click, glides the page smoothly back to the top. Uses the native smooth
- * scroll API so it honours the page's `scroll-behavior: smooth`.
+ * click, glides the page smoothly back to the top. Uses the shared Lenis
+ * engine when active, falling back to the native smooth scroll otherwise.
  */
 export function ScrollToTop() {
   const [visible, setVisible] = useState(false)
@@ -17,8 +18,11 @@ export function ScrollToTop() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const scrollUp = () =>
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+  const scrollUp = () => {
+    const lenis = getLenis()
+    if (lenis) lenis.scrollTo(0, { duration: 1 })
+    else window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+  }
 
   return (
     <AnimatePresence>

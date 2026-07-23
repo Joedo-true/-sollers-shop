@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from 'framer-motion'
 import { PackageX } from 'lucide-react'
 import type { Product } from '../types'
 import { ProductCard } from './ProductCard'
@@ -14,8 +13,12 @@ const SKELETON_COUNT = 8
 
 /**
  * The responsive product grid. While `loading` is true it shows a grid of
- * shimmering skeletons; otherwise it renders the filtered products with
- * animated entry/exit, or a friendly empty state when nothing matches.
+ * shimmering skeletons; otherwise it renders the products (each fades in on
+ * mount) or a friendly empty state when nothing matches.
+ *
+ * The grid is a plain CSS-grid container on purpose: heavy Framer `layout`
+ * re-flow animations were dropped because, with a large catalog, they left
+ * cards stranded mid-transform (empty space) and hurt scroll smoothness.
  */
 export function ProductGrid({ products, loading, onResetFilters }: ProductGridProps) {
   if (loading) {
@@ -52,15 +55,10 @@ export function ProductGrid({ products, loading, onResetFilters }: ProductGridPr
   }
 
   return (
-    <motion.div
-      layout
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-    >
-      <AnimatePresence mode="popLayout">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </AnimatePresence>
-    </motion.div>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
   )
 }

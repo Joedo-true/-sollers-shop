@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ShoppingCart, X } from 'lucide-react'
 import { useEffect } from 'react'
+import { getLenis } from '../hooks/useSmoothScroll'
 import {
   selectTotalCount,
   selectTotalPrice,
@@ -23,15 +24,17 @@ export function CartDrawer() {
   const count = selectTotalCount(items)
   const total = selectTotalPrice(items)
 
-  // Close on Escape, and lock body scroll while the drawer is open.
+  // Close on Escape, and lock background scroll while the drawer is open.
   useEffect(() => {
     if (!isOpen) return
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeCart()
     window.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
+    getLenis()?.stop()
     return () => {
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''
+      getLenis()?.start()
     }
   }, [isOpen, closeCart])
 
@@ -87,7 +90,10 @@ export function CartDrawer() {
               <EmptyCart onClose={closeCart} />
             ) : (
               <>
-                <ul className="scrollbar-thin flex-1 divide-y divide-slate-100 overflow-y-auto px-5">
+                <ul
+                  data-lenis-prevent
+                  className="scrollbar-thin flex-1 divide-y divide-slate-100 overflow-y-auto px-5"
+                >
                   <AnimatePresence initial={false}>
                     {items.map((item) => (
                       <CartItemRow key={item.product.id} item={item} />
