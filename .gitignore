@@ -8,10 +8,15 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
 dist-ssr
 *.local
 *.tsbuildinfo
+
+# The self-contained build is committed so the app can be opened with no
+# server and no build step — but ignore any other generated build output.
+dist/*
+!dist/index.html
+!dist/favicon.svg
 
 # Editor directories and files
 .vscode/*
