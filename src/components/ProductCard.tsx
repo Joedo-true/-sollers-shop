@@ -40,11 +40,12 @@ export function ProductCard({ product }: ProductCardProps) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}
+      whileHover={{ y: -6 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-shadow duration-200 hover:shadow-lg hover:shadow-slate-200/60"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-[box-shadow,border-color] duration-200 hover:border-brand-200 hover:shadow-xl hover:shadow-slate-300/50"
     >
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-slate-50 p-4">
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-slate-50 to-white p-4">
         <img
           src={product.thumbnail}
           alt={product.title}

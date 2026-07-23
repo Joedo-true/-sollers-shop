@@ -11,6 +11,13 @@
     scroll-behavior: smooth;
   }
 
+  /* Respect users who ask the OS for reduced motion. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
     font-family: theme('fontFamily.sans');

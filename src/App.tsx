@@ -7,6 +7,7 @@ import { ErrorState } from './components/ErrorState'
 import { FilterSidebar } from './components/FilterSidebar'
 import { Header } from './components/Header'
 import { ProductGrid } from './components/ProductGrid'
+import { ScrollToTop } from './components/ScrollToTop'
 import { SortSelect } from './components/SortSelect'
 import { useDebounce } from './hooks/useDebounce'
 import { discountedPrice } from './store/cartStore'
@@ -181,7 +182,7 @@ export default function App() {
   )
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100">
       <Header search={searchInput} onSearchChange={setSearchInput} />
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -201,8 +202,9 @@ export default function App() {
                 <h1 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
                   Каталог товаров
                 </h1>
+                <span className="mt-1.5 block h-1 w-12 rounded-full bg-gradient-to-r from-brand-500 to-brand-300" />
                 {!loading && !error && (
-                  <p className="mt-0.5 text-sm text-slate-500">
+                  <p className="mt-1.5 text-sm text-slate-500">
                     {visibleProducts.length}{' '}
                     {pluralizeProducts(visibleProducts.length)}
                   </p>
@@ -277,6 +279,9 @@ export default function App() {
 
       {/* Cart drawer (portal-free; controlled by the global store) */}
       <CartDrawer />
+
+      {/* Smooth "back to top" button */}
+      <ScrollToTop />
     </div>
   )
 }

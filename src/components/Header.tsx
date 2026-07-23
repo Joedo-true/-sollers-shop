@@ -18,17 +18,17 @@ export function Header({ search, onSearchChange }: HeaderProps) {
   const count = selectTotalCount(items)
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-lg">
+    <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/75 shadow-sm shadow-slate-200/40 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <a href="/" className="flex shrink-0 items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm">
+        {/* Logo (decorative — not a link) */}
+        <div className="flex shrink-0 select-none items-center gap-2">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-md shadow-brand-600/25">
             <ShoppingBag className="h-5 w-5" />
           </span>
           <span className="hidden text-lg font-extrabold tracking-tight text-slate-900 sm:block">
             Sollers<span className="text-brand-600"> Shop</span>
           </span>
-        </a>
+        </div>
 
         {/* Live search */}
         <div className="relative flex-1">

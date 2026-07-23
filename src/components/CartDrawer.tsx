@@ -117,7 +117,7 @@ export function CartDrawer() {
 
                   <button
                     type="button"
-                    className="w-full rounded-xl bg-brand-600 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-brand-700"
+                    className="w-full rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 py-3 text-sm font-bold text-white shadow-md shadow-brand-600/25 transition-all hover:from-brand-700 hover:to-brand-600 hover:shadow-lg hover:shadow-brand-600/30"
                   >
                     Оформить заказ
                   </button>
