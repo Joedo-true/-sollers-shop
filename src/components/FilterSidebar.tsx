@@ -38,7 +38,7 @@ export function FilterSidebar({
     filters.priceRange[1] !== priceBounds[1]
 
   return (
-    <div className="flex h-full flex-col gap-6">
+    <div className="flex flex-col gap-6">
       {/* Heading + reset */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5 text-slate-900">
@@ -71,7 +71,7 @@ export function FilterSidebar({
 
       {/* Categories */}
       <FilterSection title="Категории">
-        <ul className="scrollbar-thin max-h-56 space-y-1 overflow-y-auto pr-1">
+        <ul className="space-y-1">
           {categories.map((cat) => (
             <li key={cat.slug}>
               <CheckboxRow
@@ -87,7 +87,7 @@ export function FilterSidebar({
       {/* Brands */}
       {brands.length > 0 && (
         <FilterSection title="Бренды">
-          <ul className="scrollbar-thin max-h-56 space-y-1 overflow-y-auto pr-1">
+          <ul className="space-y-1">
             {brands.map((brand) => (
               <li key={brand}>
                 <CheckboxRow
@@ -103,7 +103,7 @@ export function FilterSidebar({
       )}
 
       {/* Result count footer */}
-      <div className="mt-auto rounded-xl border border-brand-100 bg-gradient-to-r from-brand-50 to-indigo-50 px-4 py-3 text-center text-sm text-slate-600">
+      <div className="rounded-xl border border-brand-100 bg-gradient-to-r from-brand-50 to-indigo-50 px-4 py-3 text-center text-sm text-slate-600">
         Найдено товаров:{' '}
         <span className="font-bold text-brand-700">{resultCount}</span>
       </div>
