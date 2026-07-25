@@ -136,39 +136,26 @@ function defaultIllustration(t: Theme): string {
     <circle cx="200" cy="222" r="28" fill="#fff" opacity="0.4"/>`
 }
 
-/** Search keyword used to fetch a real, category-relevant photo. */
-const PHOTO_KEYWORDS: Record<string, string> = {
-  smartphones: 'smartphone',
-  laptops: 'laptop',
-  headphones: 'headphones',
-  watches: 'wristwatch',
-  cameras: 'camera',
-  gaming: 'gamepad',
-  tablets: 'tablet',
-  tv: 'television',
-  fragrances: 'perfume',
-  sneakers: 'sneakers',
-  bags: 'backpack',
-  home: 'appliance',
-}
-
-/**
- * A real, category-relevant product photo URL (loremflickr serves keyword-
- * matched Flickr photos). `lock` pins a stable image per product, so the same
- * item always shows the same photo. Loads in a normal browser; when it's slow
- * or unavailable the card falls back to the instant local illustration.
- */
-export function productPhotoUrl(product: Product): string {
-  const keyword = PHOTO_KEYWORDS[product.category] ?? 'product'
-  const lock = hash(`${product.brand}|${product.id}`) % 100000
-  return `https://loremflickr.com/600/600/${keyword}?lock=${lock}`
+// Maps the real catalog's category slugs to the closest illustration above,
+// so the offline fallback still looks relevant.
+const CATEGORY_ALIAS: Record<string, string> = {
+  'mens-watches': 'watches',
+  'womens-watches': 'watches',
+  'mobile-accessories': 'smartphones',
+  'womens-bags': 'bags',
+  'mens-shoes': 'sneakers',
+  'womens-shoes': 'sneakers',
+  'sports-accessories': 'sneakers',
 }
 
 /** A self-contained SVG illustration of the product (offline fallback). */
 export function productIllustration(product: Product): string {
   const seed = hash(`${product.brand}|${product.id}`)
   const theme = THEMES[seed % THEMES.length]
-  const draw = ILLUSTRATIONS[product.category] ?? defaultIllustration
+  const key = ILLUSTRATIONS[product.category]
+    ? product.category
+    : CATEGORY_ALIAS[product.category]
+  const draw = ILLUSTRATIONS[key] ?? defaultIllustration
 
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">` +
