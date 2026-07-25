@@ -6,6 +6,7 @@ import { RangeSlider } from './RangeSlider'
 interface FilterSidebarProps {
   categories: Category[]
   brands: string[]
+  loading: boolean
   filters: Filters
   priceBounds: [number, number]
   resultCount: number
@@ -18,11 +19,14 @@ interface FilterSidebarProps {
 /**
  * The left-hand control panel: category checkboxes, brand checkboxes and the
  * price range slider. Categories and brands are derived dynamically from the
- * loaded catalog, so the filters always match the available inventory.
+ * loaded catalog, so the filters always match the available inventory. While
+ * data loads we render skeleton rows so the panel reserves its space and
+ * doesn't jump when the real filters arrive (avoids layout shift / CLS).
  */
 export function FilterSidebar({
   categories,
   brands,
+  loading,
   filters,
   priceBounds,
   resultCount,
@@ -71,34 +75,42 @@ export function FilterSidebar({
 
       {/* Categories */}
       <FilterSection title="Категории">
-        <ul className="space-y-1">
-          {categories.map((cat) => (
-            <li key={cat.slug}>
-              <CheckboxRow
-                label={cat.name}
-                checked={filters.categories.includes(cat.slug)}
-                onChange={() => onToggleCategory(cat.slug)}
-              />
-            </li>
-          ))}
-        </ul>
-      </FilterSection>
-
-      {/* Brands */}
-      {brands.length > 0 && (
-        <FilterSection title="Бренды">
+        {loading ? (
+          <SkeletonRows count={8} />
+        ) : (
           <ul className="space-y-1">
-            {brands.map((brand) => (
-              <li key={brand}>
+            {categories.map((cat) => (
+              <li key={cat.slug}>
                 <CheckboxRow
-                  label={brand}
-                  checked={filters.brands.includes(brand)}
-                  onChange={() => onToggleBrand(brand)}
-                  icon={<Tag className="h-3.5 w-3.5 text-slate-400" />}
+                  label={cat.name}
+                  checked={filters.categories.includes(cat.slug)}
+                  onChange={() => onToggleCategory(cat.slug)}
                 />
               </li>
             ))}
           </ul>
+        )}
+      </FilterSection>
+
+      {/* Brands */}
+      {(loading || brands.length > 0) && (
+        <FilterSection title="Бренды">
+          {loading ? (
+            <SkeletonRows count={8} />
+          ) : (
+            <ul className="space-y-1">
+              {brands.map((brand) => (
+                <li key={brand}>
+                  <CheckboxRow
+                    label={brand}
+                    checked={filters.brands.includes(brand)}
+                    onChange={() => onToggleBrand(brand)}
+                    icon={<Tag className="h-3.5 w-3.5 text-slate-400" />}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
         </FilterSection>
       )}
 
@@ -108,6 +120,23 @@ export function FilterSidebar({
         <span className="font-bold text-brand-700">{resultCount}</span>
       </div>
     </div>
+  )
+}
+
+/** Placeholder checkbox rows shown while the filters load (reserves height). */
+function SkeletonRows({ count }: { count: number }) {
+  return (
+    <ul className="space-y-1">
+      {Array.from({ length: count }).map((_, i) => (
+        <li key={i} className="flex items-center gap-2.5 px-2 py-1.5">
+          <span className="h-4 w-4 shrink-0 rounded bg-slate-200" />
+          <span
+            className="h-3 animate-pulse rounded bg-slate-200"
+            style={{ width: `${55 + ((i * 13) % 35)}%` }}
+          />
+        </li>
+      ))}
+    </ul>
   )
 }
 

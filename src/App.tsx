@@ -233,6 +233,7 @@ export default function App() {
     <FilterSidebar
       categories={categories}
       brands={brands}
+      loading={loading}
       filters={filters}
       priceBounds={priceBounds}
       resultCount={visibleProducts.length}
@@ -282,12 +283,13 @@ export default function App() {
                   Каталог товаров
                 </h2>
                 <span className="mt-1.5 block h-1 w-12 rounded-full bg-gradient-to-r from-brand-500 to-brand-300" />
-                {!loading && !error && (
-                  <p className="mt-1.5 text-sm text-slate-500">
-                    {visibleProducts.length}{' '}
-                    {pluralizeProducts(visibleProducts.length)}
-                  </p>
-                )}
+                {/* Fixed height reserves the line so the grid doesn't shift
+                    down when the count appears (avoids layout shift / CLS). */}
+                <p className="mt-1.5 h-5 text-sm text-slate-500">
+                  {!loading && !error
+                    ? `${visibleProducts.length} ${pluralizeProducts(visibleProducts.length)}`
+                    : ''}
+                </p>
               </div>
 
               <div className="flex items-center gap-2">

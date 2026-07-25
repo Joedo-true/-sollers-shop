@@ -4,11 +4,23 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 
 // https://vite.dev/config/
 //
-// `viteSingleFile` inlines all JS and CSS into a single dist/index.html, and
-// `base: './'` makes every asset path relative. Together this lets the built
-// page be opened straight from the filesystem (double-click index.html) with
-// no dev server and no static host — exactly what a "no server" run needs.
-export default defineConfig({
-  base: './',
-  plugins: [react(), viteSingleFile()],
+// Two build flavours share this config, selected by mode:
+//
+// • default (`npm run build`)      → single self-contained dist/index.html.
+//   `viteSingleFile` inlines all JS/CSS so the page opens straight from the
+//   filesystem (file://) with no server. This is the committed artifact.
+//
+// • pages  (`npm run build:pages`) → a normal multi-file build (tiny HTML +
+//   hashed, cacheable, compressible JS/CSS chunks). Used by the GitHub Pages
+//   workflow: far faster first paint on a real host than shipping one 400 KB
+//   inline document.
+//
+// `base: './'` keeps every asset path relative, so both flavours work from
+// file:// and from a project subpath like /<repo>/.
+export default defineConfig(({ mode }) => {
+  const singleFile = mode !== 'pages'
+  return {
+    base: './',
+    plugins: [react(), ...(singleFile ? [viteSingleFile()] : [])],
+  }
 })

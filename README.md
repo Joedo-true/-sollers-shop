@@ -62,17 +62,27 @@ npm install
 # 2. Запустить dev-сервер (http://localhost:5173) с hot-reload
 npm run dev
 
-# 3. Собрать самодостаточный dist/index.html
+# 3. Собрать самодостаточный dist/index.html (single-file, для file://)
 npm run build
+
+# 3b. Собрать оптимизированную multi-file версию (для хостинга/Pages)
+npm run build:pages
 
 # 4. Предпросмотр собранной версии
 npm run preview
 ```
 
+> **Две сборки, один конфиг.** `npm run build` инлайнит весь JS/CSS в один
+> `dist/index.html` — удобно открывать по `file://` без сервера.
+> `npm run build:pages` делает обычную сборку (крошечный `index.html` + хешируемые
+> кешируемые и сжимаемые чанки JS/CSS) — она грузится в разы быстрее на реальном
+> хостинге, поэтому её и публикует workflow GitHub Pages.
+
 ## 🌐 Публикация на GitHub Pages
 
 В репозитории есть workflow **`.github/workflows/deploy.yml`**, который сам
-собирает проект и публикует папку `dist/` на GitHub Pages.
+собирает проект командой `npm run build:pages` (оптимизированная multi-file
+сборка) и публикует папку `dist/` на GitHub Pages.
 
 **Настройка (один раз):**
 

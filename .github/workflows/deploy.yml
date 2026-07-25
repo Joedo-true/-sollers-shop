@@ -44,8 +44,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Build (multi-file, optimized for Pages)
+        run: npm run build:pages
 
       # Static asset host (Actions deploy) never runs Jekyll, but this keeps
       # the artifact safe even for the "deploy from branch" fallback.
