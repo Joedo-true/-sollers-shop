@@ -18,6 +18,7 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem)
   const [justAdded, setJustAdded] = useState(false)
+  const [photoLoaded, setPhotoLoaded] = useState(false)
 
   const price = discountedPrice(product)
   const hasDiscount = product.discountPercentage >= 1
@@ -42,13 +43,27 @@ export function ProductCard({ product }: ProductCardProps) {
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className="group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card ring-1 ring-transparent transition-[box-shadow,border-color] duration-300 hover:border-brand-200 hover:shadow-card-hover"
     >
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 p-5">
+      {/* Image: an instant local illustration sits underneath, and the real
+          product photo fetched over the network fades in on top once it loads.
+          If the photo is slow or unavailable (offline), the illustration
+          stays — so a card is never blank and layout never shifts. */}
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100">
+        <img
+          src={product.images[0]}
+          alt=""
+          aria-hidden="true"
+          className={`absolute inset-0 h-full w-full object-contain p-5 transition-opacity duration-500 ${
+            photoLoaded ? 'opacity-0' : 'opacity-100'
+          }`}
+        />
         <img
           src={product.thumbnail}
           alt={product.title}
           loading="lazy"
-          className="h-full w-full object-contain transition-transform duration-500 ease-out group-hover:scale-110"
+          onLoad={() => setPhotoLoaded(true)}
+          className={`absolute inset-0 h-full w-full object-contain p-5 transition-all duration-500 ease-out group-hover:scale-110 ${
+            photoLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
         />
         {/* Badges */}
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">

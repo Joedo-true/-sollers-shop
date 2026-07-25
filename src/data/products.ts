@@ -1,6 +1,6 @@
 import type { Category, Product } from '../types'
 import { expandCatalog } from '../utils/catalog'
-import { productImage } from '../utils/productImage'
+import { productIllustration, productPhotoUrl } from '../utils/productImage'
 
 /**
  * Local product catalog — the app's built-in "database".
@@ -112,7 +112,10 @@ const BASE_PRODUCTS: BaseProduct[] = [
 export const PRODUCTS: Product[] = expandCatalog(
   BASE_PRODUCTS.map((p, i) => ({ ...p, id: i + 1, thumbnail: '', images: [] })),
   4,
-).map((p) => {
-  const thumbnail = productImage(p)
-  return { ...p, thumbnail, images: [thumbnail] }
-})
+).map((p) => ({
+  ...p,
+  // `thumbnail` is a real photo fetched over the network; `images[0]` is the
+  // instant, offline SVG illustration the card shows underneath / as fallback.
+  thumbnail: productPhotoUrl(p),
+  images: [productIllustration(p)],
+}))

@@ -31,10 +31,11 @@ export function CartItemRow({ item }: CartItemRowProps) {
       transition={{ duration: 0.25, ease: 'easeInOut' }}
       className="flex gap-3 overflow-hidden py-4"
     >
-      {/* Thumbnail */}
+      {/* Thumbnail — use the always-available local illustration so the cart
+          renders instantly and offline. */}
       <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-slate-50 p-1.5">
         <img
-          src={product.thumbnail}
+          src={product.images[0] ?? product.thumbnail}
           alt={product.title}
           className="h-full w-full object-contain"
         />
