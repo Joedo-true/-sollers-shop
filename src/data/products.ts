@@ -1,6 +1,6 @@
 import type { Category, Product } from '../types'
 import { expandCatalog } from '../utils/catalog'
-import { productPlaceholder } from '../utils/placeholder'
+import { productImage } from '../utils/productImage'
 
 /**
  * Local product catalog — the app's built-in "database".
@@ -113,6 +113,6 @@ export const PRODUCTS: Product[] = expandCatalog(
   BASE_PRODUCTS.map((p, i) => ({ ...p, id: i + 1, thumbnail: '', images: [] })),
   4,
 ).map((p) => {
-  const thumbnail = productPlaceholder(p)
+  const thumbnail = productImage(p)
   return { ...p, thumbnail, images: [thumbnail] }
 })
