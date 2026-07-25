@@ -199,7 +199,7 @@ function CheckboxRow({
       />
       {icon}
       <span
-        className={`truncate text-sm capitalize ${
+        className={`truncate text-sm ${
           checked ? 'font-medium text-slate-900' : 'text-slate-600'
         }`}
       >

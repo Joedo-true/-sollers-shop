@@ -17,7 +17,6 @@ import { useDebounce } from './hooks/useDebounce'
 import { getLenis, useSmoothScroll } from './hooks/useSmoothScroll'
 import { discountedPrice } from './store/cartStore'
 import type { Category, Filters, Product, SortOption } from './types'
-import { expandCatalog } from './utils/catalog'
 
 /** How many products to reveal per "page" of the infinite-scroll grid. */
 const PAGE_SIZE = 24
@@ -69,8 +68,7 @@ export default function App() {
           fetchProducts(controller.signal),
           fetchCategories(controller.signal),
         ])
-        // Enrich the finite API catalog with derived variants for a fuller shop.
-        setProducts(expandCatalog(productList, 2))
+        setProducts(productList)
         setCategories(categoryList)
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return

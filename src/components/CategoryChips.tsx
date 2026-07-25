@@ -60,7 +60,7 @@ export function CategoryChips({
             key={cat.slug}
             type="button"
             onClick={() => onToggle(cat.slug)}
-            className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium capitalize transition-colors ${
+            className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
               active
                 ? 'border-brand-600 bg-brand-600 text-white shadow-sm shadow-brand-600/20'
                 : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-600'

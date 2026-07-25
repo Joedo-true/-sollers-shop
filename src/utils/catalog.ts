@@ -1,10 +1,10 @@
 import type { Product } from '../types'
 
 /**
- * The base catalog from DummyJSON is finite (~190 items). To give the shop a
+ * The curated local base catalog is intentionally small. To give the shop a
  * fuller, more realistic assortment we derive extra product variants from the
- * real ones — different editions, prices, ratings and stock — while reusing the
- * genuine thumbnails, brands and categories so images and filters stay valid.
+ * base items — different editions, prices, ratings and stock — while keeping
+ * their brand and category so filters stay valid.
  */
 
 const EDITIONS = [
