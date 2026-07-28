@@ -21,9 +21,8 @@ The core requirements, restated so they apply even when the skill file is not
 loaded:
 
 1. **Define tokens before writing code.** Pin down, in this order: subject →
-   color (4–6 named hex values, each with a reason tied to the subject) → type
-   (a deliberate display/body pairing) → layout (intent + rough wireframe) →
-   signature (the one element the design is remembered by). Never start from a
+   type (a deliberate display/body pairing) → layout (intent + rough wireframe)
+   → signature (the one element the design is remembered by). Never start from a
    layout.
 2. **No unjustified defaults.** Gradients "because modern", glassmorphism and
    stacked shadows, one system sans doing every job, hero = centered headline +

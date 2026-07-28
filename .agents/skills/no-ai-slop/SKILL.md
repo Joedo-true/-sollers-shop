@@ -37,7 +37,6 @@ Treat this list the same way as the three defaults above: none of it is forbidde
 Don't start from a layout. Start by pinning down, in this order:
 
 - **Subject** — what is this actually for, who is it for, and what's the one job this screen does? If the brief doesn't say, decide and state the assumption before moving on.
-- **Color** — 4 to 6 named hex values, each with a one-line reason tied to the subject, not to "looking modern."
 - **Type** — a display face and a body face chosen as a deliberate pair for this subject, not the default reach for any other brief. Add a third, utility face only if captions or data actually need one.
 - **Layout** — one paragraph describing the layout's intent, plus a rough ASCII wireframe, before any real code exists.
 - **Signature** — the one element this design should be remembered by. Spend the boldness here, and keep everything else around it quiet and disciplined.
