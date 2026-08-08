@@ -28,3 +28,6 @@ dist/*
 *.njsproj
 *.sln
 *.sw?
+
+# Inspection artefacts from tools/cutout.py (regenerate locally)
+src/assets/scene/_check_*
