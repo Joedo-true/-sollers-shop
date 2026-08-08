@@ -16,13 +16,13 @@ interface ShopSceneProps {
  * composition: three columns down the left of the room, the merchant standing
  * to their right. Values are fractions of the scene frame.
  */
-const COLS = [0.088, 0.212, 0.336]
-const ROWS = [0.305, 0.545, 0.762]
+const COLS = [0.118, 0.242, 0.366]
+const ROWS = [0.285, 0.515, 0.730]
 const SLOTS: CounterSlot[] = ROWS.flatMap((y, r) =>
   COLS.map((x, c) => ({
     x,
     y,
-    w: 0.094,
+    w: 0.098,
     // A degree or two of tilt each, so nine identical squares read as goods
     // set out by hand rather than a spreadsheet.
     tilt: ((r * 3 + c) % 5) - 2,
@@ -57,17 +57,20 @@ export function ShopScene({ featured, loading, onOpenCatalog }: ShopSceneProps) 
   return (
     <section
       aria-label="Лавка торговца"
-      className="relative flex w-full items-center justify-center overflow-hidden bg-wood-dark px-2 py-3"
-      style={{ minHeight: 'calc(100vh - 4.25rem)' }}
+      className="relative w-full overflow-hidden bg-wood-dark"
+      style={{ height: 'calc(100vh - 4.25rem)' }}
     >
-      {/* The frame: the painting's proportions, never cropped or stretched.
-          Height is whichever is smaller — what the window's height allows or
-          what its width allows at this ratio — so the whole room always fits. */}
+      {/* The stage fills the screen rather than sitting in a letterbox, but it
+          keeps the painting's ratio and is sized to *cover* the viewport, so
+          the room is never stretched — only its outermost edges are trimmed.
+          Keeping it one ratio-locked box is what lets every layer below stay
+          pinned in fractions of the art: the lantern glows still land on the
+          painted lanterns at any window shape. */}
       <div
-        className="relative overflow-hidden rounded-lg shadow-2xl ring-1 ring-black/40"
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
           aspectRatio: '1376 / 768',
-          width: 'min(calc(100vw - 1rem), calc((100vh - 6rem) * 1.7917))',
+          width: 'max(100vw, calc((100vh - 4.25rem) * 1.7917))',
         }}
       >
         <img
@@ -105,31 +108,13 @@ export function ShopScene({ featured, loading, onOpenCatalog }: ShopSceneProps) 
 
         <DustMotes count={14} />
 
-        {/* The merchant, standing in the room to the right of his goods. */}
-        <motion.div
-          className="pointer-events-none absolute"
-          style={{ left: '73%', top: '13%', width: '37%', transform: 'translateX(-50%)' }}
-          initial={{ opacity: 0, x: 22 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-        >
-          <motion.img
-            src={SCENE.merchantLit}
-            alt="Торговец"
-            className="w-full"
-            style={{ transformOrigin: '50% 100%' }}
-            animate={still ? undefined : { scaleY: [1, 1.013, 1], y: [0, -4, 0] }}
-            transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </motion.div>
-
         {/* Greeting. */}
         <motion.div
           initial={{ opacity: 0, y: 8, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.5, duration: 0.45, ease: 'easeOut' }}
           className="absolute rounded-xl border border-ink/25 bg-parchment-light/95 px-3 py-2 shadow-xl"
-          style={{ left: '45.5%', top: '13%', width: '25%' }}
+          style={{ left: '36%', top: '9%', width: '22%' }}
         >
           <p className="text-[clamp(0.6rem,1.35vh,0.85rem)] font-semibold leading-snug text-ink">
             Заходите, странник. Слева — девять лучших товаров лавки.
@@ -153,7 +138,7 @@ export function ShopScene({ featured, loading, onOpenCatalog }: ShopSceneProps) 
         </ul>
 
         {/* Way into the full catalog. */}
-        <div className="absolute" style={{ left: '21%', bottom: '4%', transform: 'translateX(-50%)' }}>
+        <div className="absolute" style={{ left: '24%', bottom: '5%', transform: 'translateX(-50%)' }}>
           <motion.button
             type="button"
             onClick={onOpenCatalog}
@@ -166,6 +151,28 @@ export function ShopScene({ featured, loading, onOpenCatalog }: ShopSceneProps) 
           </motion.button>
         </div>
       </div>
+
+      {/* The merchant is anchored to the screen, not to the stage.
+          The stage is deliberately wider than the viewport so the room can
+          cover it, and a figure pinned inside it gets clipped by that overhang.
+          Sizing him by the section's height instead keeps him whole and as tall
+          as the room at every window shape. */}
+      <motion.div
+        className="pointer-events-none absolute bottom-0"
+        style={{ right: '1.5%', height: '99%' }}
+        initial={{ opacity: 0, x: 26 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+      >
+        <motion.img
+          src={SCENE.merchantLit}
+          alt="Торговец"
+          className="h-full w-auto max-w-none"
+          style={{ transformOrigin: '50% 100%' }}
+          animate={still ? undefined : { scaleY: [1, 1.012, 1], y: [0, -5, 0] }}
+          transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      </motion.div>
     </section>
   )
 }
