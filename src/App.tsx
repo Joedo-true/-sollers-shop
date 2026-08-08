@@ -11,6 +11,7 @@ import { Header } from './components/Header'
 import { Hero } from './components/Hero'
 import { ProductGrid } from './components/ProductGrid'
 import { PromoBar } from './components/PromoBar'
+import { ShopScene } from './components/scene/ShopScene'
 import { ScrollToTop } from './components/ScrollToTop'
 import { SortSelect } from './components/SortSelect'
 import { useDebounce } from './hooks/useDebounce'
@@ -44,6 +45,9 @@ export default function App() {
 
   // Mobile filter panel visibility.
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+
+  // The visitor lands in the shop; the full catalog is one deliberate step away.
+  const [view, setView] = useState<'scene' | 'catalog'>('scene')
 
   // Lock background scroll while the mobile filter drawer is open.
   useEffect(() => {
@@ -111,6 +115,12 @@ export default function App() {
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b))
   }, [products])
+
+  /** The eight goods the merchant puts out front: his best-rated stock. */
+  const featured = useMemo(
+    () => [...products].sort((a, b) => b.rating - a.rating).slice(0, 8),
+    [products],
+  )
 
   /* ---- Filtering + sorting pipeline ---- */
   const visibleProducts = useMemo(() => {
@@ -242,12 +252,34 @@ export default function App() {
     />
   )
 
+  if (view === 'scene') {
+    return (
+      <div className="min-h-screen bg-wood-dark">
+        <Header search={searchInput} onSearchChange={setSearchInput} />
+        <ShopScene
+          featured={featured}
+          loading={loading}
+          onOpenCatalog={() => setView('catalog')}
+        />
+        <CartDrawer />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100">
       <PromoBar />
       <Header search={searchInput} onSearchChange={setSearchInput} />
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <button
+          type="button"
+          onClick={() => setView('scene')}
+          className="mb-5 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-soft transition-colors hover:border-brand-300 hover:text-brand-600"
+        >
+          ← Вернуться в лавку
+        </button>
+
         <Hero productCount={products.length} />
 
         <CategoryChips

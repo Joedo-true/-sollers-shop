@@ -143,6 +143,8 @@ def main() -> None:
         cut_crops()
     if what in ("goods", "all"):
         cut_goods()
+    if what in ("objects", "all"):
+        cut_objects()
 
 
 
@@ -197,6 +199,60 @@ def cut_goods() -> None:
         sprite = Image.fromarray(
             np.dstack([rgb, (alpha * 255).astype(np.uint8)]), mode="RGBA"
         )
+        bbox = sprite.getbbox()
+        if bbox:
+            sprite = sprite.crop(bbox)
+        dest = OUT / f"{name}.webp"
+        sprite.save(dest, "WEBP", quality=88, method=6)
+        print(f"{name+'.webp':18} {sprite.size[0]}x{sprite.size[1]}  "
+              f"{dest.stat().st_size // 1024} KB")
+
+
+# ── Scene objects with real alpha ────────────────────────────────────────────
+# Traced by hand from the art. Fractions of the image, so a higher-resolution
+# re-export needs no changes. Each of these gets its own motion in the scene,
+# so it must carry transparency rather than a rectangle of background.
+OBJECTS: dict[str, list[tuple[float, float]]] = {
+    # The calligraphy banner arcs across the top of the room.
+    "obj_banner": [
+        (0.035, 0.052), (0.10, 0.028), (0.20, 0.012), (0.33, 0.004),
+        (0.50, 0.000), (0.67, 0.004), (0.80, 0.014), (0.90, 0.032),
+        (0.975, 0.058), (0.975, 0.150), (0.90, 0.124), (0.80, 0.106),
+        (0.67, 0.096), (0.50, 0.092), (0.33, 0.096), (0.20, 0.106),
+        (0.10, 0.122), (0.035, 0.148),
+    ],
+    # The little figurine perched at the right end of the counter.
+    "obj_rabbit": [
+        (0.905, 0.737), (0.928, 0.723), (0.949, 0.731), (0.958, 0.752),
+        (0.967, 0.778), (0.965, 0.812), (0.950, 0.838), (0.928, 0.846),
+        (0.909, 0.836), (0.900, 0.808), (0.898, 0.772),
+    ],
+    # Compass on its stand, right-hand side.
+    "obj_compass": [
+        (0.845, 0.556), (0.878, 0.532), (0.925, 0.527), (0.968, 0.542),
+        (0.992, 0.575), (0.995, 0.617), (0.972, 0.652), (0.928, 0.668),
+        (0.879, 0.660), (0.849, 0.630), (0.838, 0.594),
+    ],
+}
+
+
+def _polygon_alpha(size, pts, feather=1.2):
+    w, h = size
+    m = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(m).polygon(pts, fill=255)
+    return m.filter(ImageFilter.GaussianBlur(feather))
+
+
+def cut_objects() -> None:
+    img = Image.open(REF / "shop.jpg").convert("RGB")
+    W, H = img.size
+    rgb = np.array(img)
+    OUT.mkdir(parents=True, exist_ok=True)
+
+    for name, poly in OBJECTS.items():
+        pts = [(x * W, y * H) for x, y in poly]
+        alpha = np.array(_polygon_alpha((W, H), pts))
+        sprite = Image.fromarray(np.dstack([rgb, alpha]), mode="RGBA")
         bbox = sprite.getbbox()
         if bbox:
             sprite = sprite.crop(bbox)
