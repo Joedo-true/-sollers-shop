@@ -22,5 +22,13 @@ export default defineConfig(({ mode }) => {
   return {
     base: './',
     plugins: [react(), ...(singleFile ? [viteSingleFile()] : [])],
+    build: {
+      // Scene sprites (the cut-out merchant and shop objects) must survive both
+      // builds. In single-file mode every asset is base64-inlined into the one
+      // HTML document, so it still opens from file:// with no server — at the
+      // cost of a bigger file. The Pages build keeps them as separate hashed
+      // files so they stay cacheable and the HTML stays tiny.
+      assetsInlineLimit: singleFile ? 1024 * 1024 * 64 : 4096,
+    },
   }
 })

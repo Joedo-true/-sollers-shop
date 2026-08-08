@@ -4,6 +4,32 @@ export default {
   theme: {
     extend: {
       colors: {
+        // ── Merchant-shop redesign ──────────────────────────────────────────
+        // Sampled from the reference art: an ink-drawn, lantern-lit barrel room
+        // of parchment and wood. Lives alongside `brand` so the redesign can
+        // land piece by piece without breaking the current site.
+        ink: {
+          DEFAULT: '#2A211B', // brush outline / calligraphy
+          soft: '#4A3B30', // secondary text on parchment
+          faint: '#7A6857', // captions, rules
+        },
+        wood: {
+          dark: '#5C3D25', // barrel shadow, deep corners
+          DEFAULT: '#8C6239', // shelves, counter
+          light: '#B08556', // lit edges
+        },
+        parchment: {
+          dark: '#D9C79E', // scroll shadow
+          DEFAULT: '#E9DCBE', // maps, hanging scrolls
+          light: '#F4EBD6', // page / card surface
+        },
+        seal: '#C0392B', // ribbons, stamps, sale marks
+        merchant: '#4F6B4A', // his coat — the "trusted" accent
+        // NB: not named `amber` — that would clobber Tailwind's built-in amber
+        // scale, which the star rating and "ХИТ" badge still use.
+        lantern: '#D98E36', // lamp light, warm highlights
+        sage: '#8FA383', // muted secondary goods
+
         brand: {
           50: '#eef4ff',
           100: '#d9e5ff',
