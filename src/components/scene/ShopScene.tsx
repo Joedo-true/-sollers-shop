@@ -1,8 +1,8 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { ScrollText } from 'lucide-react'
 import type { Product } from '../../types'
-import { GOOD_SPRITES, SCENE } from '../../assets/scene'
-import { CounterGood } from './CounterGood'
+import { SCENE } from '../../assets/scene'
+import { CounterProduct, type CounterSlot } from './CounterProduct'
 import { DustMotes } from './DustMotes'
 
 interface ShopSceneProps {
@@ -13,15 +13,37 @@ interface ShopSceneProps {
 }
 
 /**
- * The room the visitor lands in: a lantern-lit barrel shop seen through a
- * fisheye, with the merchant behind his counter and eight goods laid out in
- * front of him.
+ * Where the eight goods sit on the counter, as fractions of the scene.
  *
- * Every layer is a sprite cut from the reference art, stacked in depth order
- * and given its own motion. Nothing here loops for decoration's sake — the
- * banner and the compass drift because cloth and a needle would, the dust
- * hangs in the light shaft, and the merchant breathes so the room reads as
- * inhabited rather than a still. All of it stops under prefers-reduced-motion.
+ * The counter dips through the middle of the room because the whole painting
+ * is a fisheye, so the slots follow that curve rather than a straight line,
+ * and the goods nearer the lens are drawn slightly larger.
+ */
+const SLOTS: CounterSlot[] = [
+  { x: 0.115, y: 0.788, w: 0.105, tilt: -7 },
+  { x: 0.215, y: 0.806, w: 0.110, tilt: -4 },
+  { x: 0.318, y: 0.815, w: 0.112, tilt: -2 },
+  { x: 0.424, y: 0.822, w: 0.114, tilt: 1 },
+  { x: 0.545, y: 0.823, w: 0.114, tilt: 3 },
+  { x: 0.658, y: 0.816, w: 0.112, tilt: 5 },
+  { x: 0.760, y: 0.806, w: 0.110, tilt: 7 },
+  { x: 0.856, y: 0.786, w: 0.104, tilt: 9 },
+]
+
+/**
+ * The shop the visitor lands in.
+ *
+ * The room is the reference painting shown whole and unaltered — same framing,
+ * same proportions — so the scene box carries the art's aspect ratio and is
+ * letterboxed against dark wood rather than cropped to fit the window. Every
+ * other layer is positioned in fractions of that same box, which is what keeps
+ * the merchant standing on the floor and the goods sitting on the counter at
+ * any window size.
+ *
+ * Motion is per-object and each piece earns it: the banner and the compass
+ * drift because hanging cloth and a needle would, the figurine hops, dust hangs
+ * in the light, and the merchant breathes so the room reads as occupied. All of
+ * it stops under prefers-reduced-motion.
  */
 export function ShopScene({ featured, loading, onOpenCatalog }: ShopSceneProps) {
   const still = useReducedMotion()
@@ -29,30 +51,47 @@ export function ShopScene({ featured, loading, onOpenCatalog }: ShopSceneProps) 
   return (
     <section
       aria-label="Лавка торговца"
-      className="relative isolate w-full overflow-hidden bg-wood-dark"
-      style={{ minHeight: 'min(88vh, 60rem)' }}
+      className="relative flex w-full items-center justify-center overflow-hidden bg-wood-dark py-4"
+      style={{ minHeight: 'calc(100vh - 4.25rem)' }}
     >
-      {/* One stage shared by the backdrop and every overlay.
-          The sprites were cut as fractions of the source art, so as long as
-          they are positioned with those same fractions inside a box that has
-          the art's aspect ratio, each overlay lands exactly on top of the
-          object it was cut from — no second compass floating beside the
-          painted one. translateY picks the band of the (tall) painting that
-          the viewport shows. */}
+      {/* The scene box: the painting's own proportions, never distorted.
+          Its height is whichever is smaller — what the window's height allows,
+          or what its width allows at this aspect ratio — so the whole room
+          stays visible and uncropped at any window shape. A percentage height
+          cannot be used here: the flex parent is sized by its content, so
+          `height: 100%` would have nothing to resolve against. */}
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-0 w-full"
-        style={{ aspectRatio: '848 / 1264', transform: 'translateY(-33%)' }}
+        className="relative shadow-2xl"
+        style={{
+          aspectRatio: '848 / 1264',
+          height: 'min(calc(100vh - 5.5rem), calc((100vw - 1.5rem) * 1.4906))',
+        }}
       >
-        <img src={SCENE.backdrop} alt="" className="absolute inset-0 h-full w-full" />
+        <img
+          src={SCENE.backdrop}
+          alt="Лавка торговца изнутри"
+          className="absolute inset-0 h-full w-full select-none"
+          draggable={false}
+        />
 
-        {/* Compass on its stand: the needle never quite settles. */}
+        {/* Banner across the top: hanging cloth, so it drifts. */}
+        <motion.img
+          src={SCENE.banner}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute"
+          style={{ left: '3.5%', top: '0%', width: '94%', transformOrigin: '50% 0%' }}
+          animate={still ? undefined : { rotate: [-0.45, 0.45, -0.45] }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        {/* Compass: the needle never quite settles. */}
         <motion.img
           src={SCENE.compass}
           alt=""
-          className="absolute"
-          style={{ left: '83.8%', top: '52.7%', width: '15.7%',
-                   transformOrigin: '50% 60%' }}
+          aria-hidden="true"
+          className="pointer-events-none absolute"
+          style={{ left: '83.8%', top: '52.7%', width: '15.7%', transformOrigin: '50% 60%' }}
           animate={still ? undefined : { rotate: [-1.5, 1.5, -1.5] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
         />
@@ -61,97 +100,76 @@ export function ShopScene({ featured, loading, onOpenCatalog }: ShopSceneProps) 
         <motion.img
           src={SCENE.rabbit}
           alt=""
-          className="absolute"
-          style={{ left: '89.8%', top: '72.3%', width: '6.9%' }}
-          animate={still ? undefined : { y: ['0%', '-14%', '0%', '0%', '0%'] }}
-          transition={{ duration: 5.5, repeat: Infinity,
-                        times: [0, 0.07, 0.16, 0.5, 1] }}
-        />
-      </div>
-
-      {/* Lantern light from the skylight, and the dark barrel edges. Both are
-          painted in the original; deepening them lets the merchant and the
-          goods sit clearly in front of the room. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(46% 40% at 50% 12%, rgba(255,228,170,0.34), transparent 72%),' +
-            'radial-gradient(80% 64% at 50% 60%, transparent 28%, rgba(24,17,11,0.88) 100%)',
-        }}
-      />
-
-      <DustMotes />
-
-      {/* The merchant. He breathes; that alone makes the room feel occupied. */}
-      <motion.div
-        className="absolute bottom-[27%] left-1/2 w-[30%] min-w-[230px] max-w-[400px] -translate-x-1/2"
-        initial={{ opacity: 0, y: 26 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
-      >
-        <motion.img
-          src={SCENE.merchant}
-          alt="Торговец за прилавком"
-          className="w-full drop-shadow-2xl"
-          style={{ transformOrigin: '50% 100%' }}
-          animate={still ? undefined : { scaleY: [1, 1.012, 1], y: [0, -3, 0] }}
-          transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      </motion.div>
-
-      {/* Greeting. Speaks as a trader would, about this shop's actual stock. */}
-      <motion.div
-        initial={{ opacity: 0, y: 10, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 0.45, duration: 0.45, ease: 'easeOut' }}
-        className="absolute left-[6%] top-[13%] w-[78%] max-w-xs rounded-2xl border border-ink/20 bg-parchment-light/95 px-5 py-3 shadow-xl sm:w-[42%]"
-      >
-        <p className="text-sm font-semibold leading-snug text-ink">
-          Заходите, странник. Сегодня на прилавке — восемь лучших свитков
-          из моего обоза.
-        </p>
-        <span
           aria-hidden="true"
-          className="absolute -bottom-2 left-10 h-4 w-4 rotate-45 border-b border-r border-ink/20 bg-parchment-light"
+          className="pointer-events-none absolute"
+          style={{ left: '89.8%', top: '72.3%', width: '6.9%' }}
+          animate={still ? undefined : { y: ['0%', '-16%', '0%', '0%', '0%'] }}
+          transition={{ duration: 5.5, repeat: Infinity, times: [0, 0.07, 0.16, 0.55, 1] }}
         />
-      </motion.div>
 
-      {/* The figurine on the end of the counter, watching the shop. */}
-      <motion.img
-        src={SCENE.rabbit}
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-[19%] right-[6%] w-[5%] min-w-[34px]"
-        animate={still ? undefined : { y: [0, -7, 0, 0, 0] }}
-        transition={{ duration: 5.5, repeat: Infinity, times: [0, 0.07, 0.16, 0.5, 1] }}
-      />
+        <DustMotes />
 
-      {/* Counter: the eight goods on offer. */}
-      <div className="absolute inset-x-0 bottom-0 pb-6 pt-2">
-        <ul className="mx-auto flex max-w-4xl items-end justify-center gap-[1.1%] px-3">
-          {(loading ? Array.from({ length: 8 }) : featured).map((p, i) => (
-            <CounterGood
+        {/* The merchant, standing in the room behind his counter. */}
+        <motion.div
+          className="pointer-events-none absolute"
+          style={{ left: '50%', top: '30%', width: '34%', transform: 'translateX(-50%)' }}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+        >
+          <motion.img
+            src={SCENE.merchant}
+            alt="Торговец"
+            className="w-full drop-shadow-[0_16px_18px_rgba(18,12,7,0.65)]"
+            style={{ transformOrigin: '50% 100%' }}
+            animate={still ? undefined : { scaleY: [1, 1.014, 1], y: [0, -3, 0] }}
+            transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </motion.div>
+
+        {/* Greeting, tucked into the room's left-hand wall. */}
+        <motion.div
+          initial={{ opacity: 0, y: 8, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.5, duration: 0.45, ease: 'easeOut' }}
+          className="absolute rounded-xl border border-ink/25 bg-parchment-light/95 px-3 py-2 shadow-xl"
+          style={{ left: '4%', top: '17%', width: '40%' }}
+        >
+          <p className="text-[clamp(0.62rem,1.5vh,0.9rem)] font-semibold leading-snug text-ink">
+            Заходите, странник. На прилавке — восемь лучших товаров лавки.
+          </p>
+          <span
+            aria-hidden="true"
+            className="absolute -bottom-1.5 left-8 h-3 w-3 rotate-45 border-b border-r border-ink/25 bg-parchment-light"
+          />
+        </motion.div>
+
+        {/* The goods: the shop's own best-rated stock, laid out on the counter. */}
+        <ul className="absolute inset-0">
+          {(loading ? Array.from({ length: SLOTS.length }) : featured).map((p, i) => (
+            <CounterProduct
               key={(p as Product)?.id ?? i}
               product={p as Product | undefined}
-              sprite={GOOD_SPRITES[i % GOOD_SPRITES.length]}
+              slot={SLOTS[i] ?? SLOTS[SLOTS.length - 1]}
               index={i}
             />
           ))}
         </ul>
 
-        <div className="mt-4 flex justify-center">
-          <motion.button
-            type="button"
-            onClick={onOpenCatalog}
-            whileHover={still ? undefined : { y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            className="inline-flex items-center gap-2 rounded-xl border border-ink/30 bg-parchment px-6 py-3 text-sm font-bold text-ink shadow-lg transition-colors hover:bg-parchment-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lantern"
-          >
-            <ScrollText className="h-4 w-4" />
-            Развернуть полный список товаров
-          </motion.button>
+        {/* Way into the full catalog, resting on the shop floor. */}
+        <div className="absolute inset-x-0" style={{ bottom: '2.5%' }}>
+          <div className="flex justify-center">
+            <motion.button
+              type="button"
+              onClick={onOpenCatalog}
+              whileHover={still ? undefined : { y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center gap-2 rounded-lg border border-ink/40 bg-parchment px-4 py-2 text-[clamp(0.65rem,1.5vh,0.85rem)] font-bold text-ink shadow-lg transition-colors hover:bg-parchment-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lantern"
+            >
+              <ScrollText className="h-3.5 w-3.5" />
+              Весь товар лавки
+            </motion.button>
+          </div>
         </div>
       </div>
     </section>
