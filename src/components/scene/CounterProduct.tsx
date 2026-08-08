@@ -72,7 +72,10 @@ export function CounterProduct({ product, slot, index }: CounterProductProps) {
           setTaken(true)
         }}
         aria-label={`Взять «${product.title}» за ${formatPrice(price)}`}
-        className="group relative block w-full rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lantern"
+        // aspect-square, not the image's intrinsic size: the visible layer is a
+        // remote product photo, and when it is slow or blocked the box would
+        // otherwise collapse to a sliver and the mat would stretch into a bar.
+        className="group relative block aspect-square w-full rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lantern"
         style={{ rotate: `${slot.tilt}deg` }}
         whileHover={still ? undefined : { y: -14, scale: 1.14, rotate: 0 }}
         whileTap={{ scale: 0.96 }}
@@ -85,7 +88,7 @@ export function CounterProduct({ product, slot, index }: CounterProductProps) {
             on paper, the way the rest of this shop labels its wares. */}
         <span
           aria-hidden="true"
-          className="absolute -inset-[9%] rounded-[3px] bg-parchment shadow-[0_2px_4px_rgba(20,14,8,0.55)] ring-1 ring-ink/25"
+          className="absolute -inset-[7%] rounded-[3px] bg-parchment shadow-[0_2px_4px_rgba(20,14,8,0.55)] ring-1 ring-ink/25"
           style={{ rotate: `${slot.tilt * 0.6}deg` }}
         />
 
@@ -101,7 +104,7 @@ export function CounterProduct({ product, slot, index }: CounterProductProps) {
           src={product.images[0]}
           alt=""
           aria-hidden="true"
-          className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${
+          className={`absolute inset-0 h-full w-full object-contain p-[6%] transition-opacity duration-500 ${
             photoOk ? 'opacity-0' : 'opacity-100'
           }`}
         />
@@ -109,7 +112,7 @@ export function CounterProduct({ product, slot, index }: CounterProductProps) {
           src={product.thumbnail}
           alt={product.title}
           onLoad={() => setPhotoOk(true)}
-          className={`relative h-full w-full object-contain drop-shadow-[0_2px_3px_rgba(20,14,8,0.45)] transition-opacity duration-500 ${
+          className={`absolute inset-0 h-full w-full object-contain p-[6%] drop-shadow-[0_2px_3px_rgba(20,14,8,0.45)] transition-opacity duration-500 ${
             photoOk ? 'opacity-100' : 'opacity-0'
           }`}
         />

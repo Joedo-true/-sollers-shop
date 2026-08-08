@@ -5,6 +5,8 @@
  * (so it still opens from file://) and hashed files in the Pages build.
  */
 import backdrop from './backdrop.webp'
+import backdrop2 from './backdrop2.webp'
+import merchantLit from './merchant_lit.webp'
 import merchant from './merchant.webp'
 import banner from './obj_banner.webp'
 import compass from './obj_compass.webp'
@@ -22,7 +24,7 @@ import goodJade from './good_jade.webp'
 import goodCoral from './good_coral.webp'
 import goodRust from './good_rust.webp'
 
-export const SCENE = { backdrop, merchant, banner, compass, rabbit }
+export const SCENE = { backdrop, backdrop2, merchant, merchantLit, banner, compass, rabbit }
 
 /** The cut-out goods, in the order they read best across the counter. */
 export const GOOD_SPRITES: string[] = [

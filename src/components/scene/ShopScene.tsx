@@ -6,44 +6,50 @@ import { CounterProduct, type CounterSlot } from './CounterProduct'
 import { DustMotes } from './DustMotes'
 
 interface ShopSceneProps {
-  /** The eight goods laid out on the counter. */
   featured: Product[]
   loading: boolean
   onOpenCatalog: () => void
 }
 
 /**
- * Where the eight goods sit on the counter, as fractions of the scene.
- *
- * The counter dips through the middle of the room because the whole painting
- * is a fisheye, so the slots follow that curve rather than a straight line,
- * and the goods nearer the lens are drawn slightly larger.
+ * The nine goods on display, laid out as the 3x3 grid in the approved
+ * composition: three columns down the left of the room, the merchant standing
+ * to their right. Values are fractions of the scene frame.
  */
-const SLOTS: CounterSlot[] = [
-  { x: 0.115, y: 0.788, w: 0.105, tilt: -7 },
-  { x: 0.215, y: 0.806, w: 0.110, tilt: -4 },
-  { x: 0.318, y: 0.815, w: 0.112, tilt: -2 },
-  { x: 0.424, y: 0.822, w: 0.114, tilt: 1 },
-  { x: 0.545, y: 0.823, w: 0.114, tilt: 3 },
-  { x: 0.658, y: 0.816, w: 0.112, tilt: 5 },
-  { x: 0.760, y: 0.806, w: 0.110, tilt: 7 },
-  { x: 0.856, y: 0.786, w: 0.104, tilt: 9 },
+const COLS = [0.088, 0.212, 0.336]
+const ROWS = [0.305, 0.545, 0.762]
+const SLOTS: CounterSlot[] = ROWS.flatMap((y, r) =>
+  COLS.map((x, c) => ({
+    x,
+    y,
+    w: 0.094,
+    // A degree or two of tilt each, so nine identical squares read as goods
+    // set out by hand rather than a spreadsheet.
+    tilt: ((r * 3 + c) % 5) - 2,
+  })),
+)
+
+/** Warm pools under the shop's two hanging paper lanterns. */
+const LANTERNS = [
+  { x: 0.545, y: 0.075 },
+  { x: 0.793, y: 0.07 },
 ]
 
 /**
  * The shop the visitor lands in.
  *
- * The room is the reference painting shown whole and unaltered — same framing,
- * same proportions — so the scene box carries the art's aspect ratio and is
- * letterboxed against dark wood rather than cropped to fit the window. Every
- * other layer is positioned in fractions of that same box, which is what keeps
- * the merchant standing on the floor and the goods sitting on the counter at
- * any window size.
+ * The room is the reference painting shown whole and undistorted — the frame
+ * carries the art's aspect ratio, so the shape of the shop is the shape that
+ * was drawn. Everything else is positioned in fractions of that frame: the
+ * goods in their 3x3 grid on the left, the merchant standing to their right.
  *
- * Motion is per-object and each piece earns it: the banner and the compass
- * drift because hanging cloth and a needle would, the figurine hops, dust hangs
- * in the light, and the merchant breathes so the room reads as occupied. All of
- * it stops under prefers-reduced-motion.
+ * The merchant is the relit sprite (tools/relight.py), graded to this room's
+ * measured colour and lit from where its lanterns actually hang — a raw
+ * cut-out reads as a sticker no matter how well it is masked.
+ *
+ * Every loop earns its place: the lantern glow breathes, dust hangs in the
+ * light, the merchant breathes so the room reads as occupied, and a good lifts
+ * when you reach for it. All of it stops under prefers-reduced-motion.
  */
 export function ShopScene({ featured, loading, onOpenCatalog }: ShopSceneProps) {
   const still = useReducedMotion()
@@ -51,100 +57,90 @@ export function ShopScene({ featured, loading, onOpenCatalog }: ShopSceneProps) 
   return (
     <section
       aria-label="Лавка торговца"
-      className="relative flex w-full items-center justify-center overflow-hidden bg-wood-dark py-4"
+      className="relative flex w-full items-center justify-center overflow-hidden bg-wood-dark px-2 py-3"
       style={{ minHeight: 'calc(100vh - 4.25rem)' }}
     >
-      {/* The scene box: the painting's own proportions, never distorted.
-          Its height is whichever is smaller — what the window's height allows,
-          or what its width allows at this aspect ratio — so the whole room
-          stays visible and uncropped at any window shape. A percentage height
-          cannot be used here: the flex parent is sized by its content, so
-          `height: 100%` would have nothing to resolve against. */}
+      {/* The frame: the painting's proportions, never cropped or stretched.
+          Height is whichever is smaller — what the window's height allows or
+          what its width allows at this ratio — so the whole room always fits. */}
       <div
-        className="relative shadow-2xl"
+        className="relative overflow-hidden rounded-lg shadow-2xl ring-1 ring-black/40"
         style={{
-          aspectRatio: '848 / 1264',
-          height: 'min(calc(100vh - 5.5rem), calc((100vw - 1.5rem) * 1.4906))',
+          aspectRatio: '1376 / 768',
+          width: 'min(calc(100vw - 1rem), calc((100vh - 6rem) * 1.7917))',
         }}
       >
         <img
-          src={SCENE.backdrop}
+          src={SCENE.backdrop2}
           alt="Лавка торговца изнутри"
           className="absolute inset-0 h-full w-full select-none"
           draggable={false}
         />
 
-        {/* Banner across the top: hanging cloth, so it drifts. */}
-        <motion.img
-          src={SCENE.banner}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute"
-          style={{ left: '3.5%', top: '0%', width: '94%', transformOrigin: '50% 0%' }}
-          animate={still ? undefined : { rotate: [-0.45, 0.45, -0.45] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        />
+        {/* Lantern glow. Paper lanterns flicker; matching that in light rather
+            than moving the lantern is what makes the room feel lit. */}
+        {LANTERNS.map((l, i) => (
+          <motion.div
+            key={i}
+            aria-hidden="true"
+            className="pointer-events-none absolute rounded-full"
+            style={{
+              left: `${l.x * 100}%`,
+              top: `${l.y * 100}%`,
+              width: '26%',
+              aspectRatio: '1',
+              transform: 'translate(-50%, -50%)',
+              background:
+                'radial-gradient(circle, rgba(255,206,122,0.30), transparent 68%)',
+              mixBlendMode: 'screen',
+            }}
+            animate={still ? undefined : { opacity: [0.75, 1, 0.85, 1, 0.78] }}
+            transition={{
+              duration: 6 + i * 1.7,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
 
-        {/* Compass: the needle never quite settles. */}
-        <motion.img
-          src={SCENE.compass}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute"
-          style={{ left: '83.8%', top: '52.7%', width: '15.7%', transformOrigin: '50% 60%' }}
-          animate={still ? undefined : { rotate: [-1.5, 1.5, -1.5] }}
-          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-        />
+        <DustMotes count={14} />
 
-        {/* The figurine at the end of the counter. */}
-        <motion.img
-          src={SCENE.rabbit}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute"
-          style={{ left: '89.8%', top: '72.3%', width: '6.9%' }}
-          animate={still ? undefined : { y: ['0%', '-16%', '0%', '0%', '0%'] }}
-          transition={{ duration: 5.5, repeat: Infinity, times: [0, 0.07, 0.16, 0.55, 1] }}
-        />
-
-        <DustMotes />
-
-        {/* The merchant, standing in the room behind his counter. */}
+        {/* The merchant, standing in the room to the right of his goods. */}
         <motion.div
           className="pointer-events-none absolute"
-          style={{ left: '50%', top: '30%', width: '34%', transform: 'translateX(-50%)' }}
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
+          style={{ left: '73%', top: '13%', width: '37%', transform: 'translateX(-50%)' }}
+          initial={{ opacity: 0, x: 22 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, ease: 'easeOut' }}
         >
           <motion.img
-            src={SCENE.merchant}
+            src={SCENE.merchantLit}
             alt="Торговец"
-            className="w-full drop-shadow-[0_16px_18px_rgba(18,12,7,0.65)]"
+            className="w-full"
             style={{ transformOrigin: '50% 100%' }}
-            animate={still ? undefined : { scaleY: [1, 1.014, 1], y: [0, -3, 0] }}
+            animate={still ? undefined : { scaleY: [1, 1.013, 1], y: [0, -4, 0] }}
             transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
           />
         </motion.div>
 
-        {/* Greeting, tucked into the room's left-hand wall. */}
+        {/* Greeting. */}
         <motion.div
           initial={{ opacity: 0, y: 8, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.5, duration: 0.45, ease: 'easeOut' }}
           className="absolute rounded-xl border border-ink/25 bg-parchment-light/95 px-3 py-2 shadow-xl"
-          style={{ left: '4%', top: '17%', width: '40%' }}
+          style={{ left: '45.5%', top: '13%', width: '25%' }}
         >
-          <p className="text-[clamp(0.62rem,1.5vh,0.9rem)] font-semibold leading-snug text-ink">
-            Заходите, странник. На прилавке — восемь лучших товаров лавки.
+          <p className="text-[clamp(0.6rem,1.35vh,0.85rem)] font-semibold leading-snug text-ink">
+            Заходите, странник. Слева — девять лучших товаров лавки.
           </p>
           <span
             aria-hidden="true"
-            className="absolute -bottom-1.5 left-8 h-3 w-3 rotate-45 border-b border-r border-ink/25 bg-parchment-light"
+            className="absolute -right-1.5 top-6 h-3 w-3 rotate-45 border-r border-t border-ink/25 bg-parchment-light"
           />
         </motion.div>
 
-        {/* The goods: the shop's own best-rated stock, laid out on the counter. */}
+        {/* The goods: the shop's own best-rated stock. */}
         <ul className="absolute inset-0">
           {(loading ? Array.from({ length: SLOTS.length }) : featured).map((p, i) => (
             <CounterProduct
@@ -156,20 +152,18 @@ export function ShopScene({ featured, loading, onOpenCatalog }: ShopSceneProps) 
           ))}
         </ul>
 
-        {/* Way into the full catalog, resting on the shop floor. */}
-        <div className="absolute inset-x-0" style={{ bottom: '2.5%' }}>
-          <div className="flex justify-center">
-            <motion.button
-              type="button"
-              onClick={onOpenCatalog}
-              whileHover={still ? undefined : { y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              className="inline-flex items-center gap-2 rounded-lg border border-ink/40 bg-parchment px-4 py-2 text-[clamp(0.65rem,1.5vh,0.85rem)] font-bold text-ink shadow-lg transition-colors hover:bg-parchment-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lantern"
-            >
-              <ScrollText className="h-3.5 w-3.5" />
-              Весь товар лавки
-            </motion.button>
-          </div>
+        {/* Way into the full catalog. */}
+        <div className="absolute" style={{ left: '21%', bottom: '4%', transform: 'translateX(-50%)' }}>
+          <motion.button
+            type="button"
+            onClick={onOpenCatalog}
+            whileHover={still ? undefined : { y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            className="inline-flex items-center gap-2 rounded-lg border border-ink/40 bg-parchment px-4 py-2 text-[clamp(0.62rem,1.4vh,0.85rem)] font-bold text-ink shadow-lg transition-colors hover:bg-parchment-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lantern"
+          >
+            <ScrollText className="h-3.5 w-3.5" />
+            Весь товар лавки
+          </motion.button>
         </div>
       </div>
     </section>

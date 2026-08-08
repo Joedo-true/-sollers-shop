@@ -116,9 +116,10 @@ export default function App() {
     return Array.from(set).sort((a, b) => a.localeCompare(b))
   }, [products])
 
-  /** The eight goods the merchant puts out front: his best-rated stock. */
+  /** The goods the merchant puts out front: his best-rated stock, nine of
+      them to fill the 3x3 display in the scene. */
   const featured = useMemo(
-    () => [...products].sort((a, b) => b.rating - a.rating).slice(0, 8),
+    () => [...products].sort((a, b) => b.rating - a.rating).slice(0, 9),
     [products],
   )
 
