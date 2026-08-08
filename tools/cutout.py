@@ -141,7 +141,69 @@ def main() -> None:
         cut_merchant()
     if what in ("crops", "all"):
         cut_crops()
+    if what in ("goods", "all"):
+        cut_goods()
 
+
+
+# ── Individual goods on the counter ──────────────────────────────────────────
+# Each rolled scroll is a capsule: a cylinder seen at an angle. Describing it by
+# its two end centres plus a radius (all as fractions of the image) is both
+# far shorter than a hand-traced polygon and much easier to nudge — and it
+# survives a higher-resolution re-export unchanged.
+#   name: (end A, end B, radius)
+GOODS: dict[str, tuple[tuple[float, float], tuple[float, float], float]] = {
+    # Left tray, five rolls running parallel down-left.
+    "good_pearl":   ((0.168, 0.731), (0.099, 0.819), 0.0158),
+    "good_rose":    ((0.209, 0.729), (0.140, 0.817), 0.0158),
+    "good_saffron": ((0.250, 0.729), (0.181, 0.817), 0.0158),
+    "good_ember":   ((0.291, 0.733), (0.222, 0.821), 0.0158),
+    "good_olive":   ((0.330, 0.745), (0.261, 0.833), 0.0152),
+    # The big vermilion roll laid out on its own in the middle.
+    "good_vermil":  ((0.420, 0.760), (0.404, 0.856), 0.0200),
+    # Right tray, four rolls.
+    "good_cream": ((0.697, 0.747), (0.640, 0.832), 0.0166),
+    "good_amber": ((0.732, 0.741), (0.677, 0.826), 0.0166),
+    "good_jade":  ((0.768, 0.734), (0.715, 0.821), 0.0166),
+    "good_coral": ((0.815, 0.724), (0.758, 0.813), 0.0166),
+    "good_rust":  ((0.858, 0.731), (0.805, 0.808), 0.0166),
+}
+
+
+def _capsule_alpha(size, p1, p2, r, feather=1.6):
+    """Anti-aliased alpha for a capsule (stadium) between two points."""
+    w, h = size
+    ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
+    ax, ay = p1
+    bx, by = p2
+    dx, dy = bx - ax, by - ay
+    L2 = max(dx * dx + dy * dy, 1e-6)
+    t = np.clip(((xs - ax) * dx + (ys - ay) * dy) / L2, 0.0, 1.0)
+    dist = np.hypot(xs - (ax + t * dx), ys - (ay + t * dy))
+    return np.clip((r - dist) / feather + 0.5, 0.0, 1.0)
+
+
+def cut_goods() -> None:
+    img = Image.open(REF / "shop.jpg").convert("RGB")
+    W, H = img.size
+    rgb = np.array(img)
+    OUT.mkdir(parents=True, exist_ok=True)
+
+    for name, (a, b, rf) in GOODS.items():
+        p1 = (a[0] * W, a[1] * H)
+        p2 = (b[0] * W, b[1] * H)
+        r = rf * ((W + H) / 2)
+        alpha = _capsule_alpha((W, H), p1, p2, r)
+        sprite = Image.fromarray(
+            np.dstack([rgb, (alpha * 255).astype(np.uint8)]), mode="RGBA"
+        )
+        bbox = sprite.getbbox()
+        if bbox:
+            sprite = sprite.crop(bbox)
+        dest = OUT / f"{name}.webp"
+        sprite.save(dest, "WEBP", quality=88, method=6)
+        print(f"{name+'.webp':18} {sprite.size[0]}x{sprite.size[1]}  "
+              f"{dest.stat().st_size // 1024} KB")
 
 if __name__ == "__main__":
     main()

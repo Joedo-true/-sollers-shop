@@ -31,3 +31,4 @@ dist/*
 
 # Inspection artefacts from tools/cutout.py (regenerate locally)
 src/assets/scene/_check_*
+src/assets/scene/_grid_*
